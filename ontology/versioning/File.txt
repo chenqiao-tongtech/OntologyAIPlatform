@@ -1,0 +1,52 @@
+
+def record_review_decision(
+    self,
+    candidate_id: UUID,
+    approval_record_id: UUID,
+    reviewer_id: UUID,
+    approved: bool,
+) -> CandidateSubmission:
+    candidate = self.workspaces.get_candidate(candidate_id)
+
+    self.authorization.authorize(
+        reviewer_id,
+        "candidate.review",
+        candidate.project_id,
+    )
+
+    if candidate.status != CandidateStatus.AWAITING_REVIEW:
+        raise CandidateStateError(
+            "Only candidates awaiting review can be reviewed."
+        )
+
+    approval = self.approvals.get_approved_record(
+        candidate_id,
+        approval_record_id,
+    )
+
+    if approval.reviewer_id != reviewer_id:
+        raise CandidateStateError(
+            "Approval record reviewer does not match the current user."
+        )
+
+    if approved and approval.decision != "approved":
+        raise CandidateStateError("Approval record is not approved.")
+
+    if not approved and approval.decision != "rejected":
+        raise CandidateStateError("Approval record is not rejected.")
+
+    new_status = (
+        CandidateStatus.APPROVED
+        if approved
+        else CandidateStatus.REJECTED
+    )
+
+    updated = CandidateSubmission(
+        **{
+            **candidate.__dict__,
+            "status": new_status,
+            "approval_record_id": approval_record_id,
+        }
+    )
+
+    return self.workspaces.update_candidate(updated)

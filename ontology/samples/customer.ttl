@@ -1,0 +1,44 @@
+
+@prefix ex:   <https://example.com/ontology/customer#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+<https://example.com/ontology/customer>
+    a owl:Ontology .
+
+ex:Person
+    a owl:Class ;
+    rdfs:label "Person"@en ;
+    rdfs:label "自然人"@zh-CN .
+
+ex:Customer
+    a owl:Class ;
+    rdfs:subClassOf ex:Person ;
+    rdfs:label "Customer"@en ;
+    rdfs:label "客户"@zh-CN ;
+    rdfs:comment "A customer of the enterprise."@en .
+
+ex:Order
+    a owl:Class ;
+    rdfs:label "Order"@en ;
+    rdfs:label "订单"@zh-CN .
+
+ex:customerId
+    a owl:DatatypeProperty ;
+    rdfs:domain ex:Customer ;
+    rdfs:range xsd:string .
+
+ex:hasOrder
+    a owl:ObjectProperty ;
+    rdfs:domain ex:Customer ;
+    rdfs:range ex:Order .
+
+ex:PreferredCustomer
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty ex:hasOrder ;
+        owl:minCardinality "2"^^xsd:nonNegativeInteger
+    ] .

@@ -1,0 +1,27 @@
+//
+//  ex.swift
+//  
+//
+//  Created by joechen on 2026/11/21.
+//
+
+
+
+@prefix ex: <https://example.com/ontology/customer#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:CustomerShape
+    a sh:NodeShape ;
+    sh:targetClass ex:Customer ;
+
+    sh:property [
+        sh:path ex:customerId ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string
+    ] ;
+
+    sh:property [
+        sh:path ex:hasOrder ;
+        sh:class ex:Order
+    ] .
