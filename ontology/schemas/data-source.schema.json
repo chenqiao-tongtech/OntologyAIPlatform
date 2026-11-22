@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.p1.invalid/data-source.schema.json",
+  "title": "DataSource",
+  "allOf": [
+    {
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/projectScoped"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "sourceType": {
+          "enum": [
+            "postgresql",
+            "mysql",
+            "sql_server",
+            "oracle",
+            "mongodb",
+            "document_store",
+            "rest_api",
+            "graphql",
+            "git",
+            "s3",
+            "other"
+          ]
+        },
+        "connectionSecretRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "configuration": {
+          "type": "object"
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "active",
+            "archived",
+            "deprecated"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "sourceType",
+        "connectionSecretRef",
+        "configuration",
+        "status"
+      ]
+    }
+  ],
+  "unevaluatedProperties": false
+}

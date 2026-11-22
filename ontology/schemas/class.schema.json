@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.p1.invalid/class.schema.json",
+  "title": "OntologyClass",
+  "allOf": [
+    {
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/projectScoped"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "ontologyId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "ontologyVersionId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "iri": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/iri"
+        },
+        "preferredLabels": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/label"
+          }
+        },
+        "definition": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "parentClassIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+          }
+        },
+        "abstract": {
+          "type": "boolean"
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "active",
+            "archived",
+            "deprecated"
+          ]
+        },
+        "sourceRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/sourceReference"
+          }
+        }
+      },
+      "required": [
+        "ontologyId",
+        "ontologyVersionId",
+        "iri",
+        "preferredLabels",
+        "parentClassIds",
+        "abstract",
+        "status"
+      ]
+    }
+  ],
+  "unevaluatedProperties": false
+}

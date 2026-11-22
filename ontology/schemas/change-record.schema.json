@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.p1.invalid/change-record.schema.json",
+  "title": "ChangeRecord",
+  "allOf": [
+    {
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/projectScoped"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "ontologyId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "fromVersionId": {
+          "oneOf": [
+            {
+              "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "toVersionId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "operation": {
+          "enum": [
+            "create",
+            "update",
+            "delete",
+            "deprecate",
+            "replace",
+            "rename"
+          ]
+        },
+        "targetElementId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "diffRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "changedBy": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "changedAt": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/dateTime"
+        }
+      },
+      "required": [
+        "ontologyId",
+        "toVersionId",
+        "operation",
+        "targetElementId",
+        "diffRef",
+        "changedBy",
+        "changedAt"
+      ]
+    }
+  ],
+  "unevaluatedProperties": false
+}

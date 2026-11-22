@@ -1,361 +1,154 @@
 # P1 Ontology Meta-model Design
 
-- Document: `docs/ontology/metamodel.md`
 - Version: V1.0
 - Date: 2026-11-21
-- Status: Design Baseline
-- Scope: P1 Ontology Engineering Platform MVP
+- Status: Engineering Baseline
+- Scope: P1 MVP
 
 ## 1. Purpose
 
-本文件定义 P1 平台内部统一元模型的对象边界、对象关系、字段约束、版本规则和扩展机制。
+本文件定义 P1 内部元模型的对象边界、标识策略、引用约束、版本规则和扩展机制。平台元模型负责描述平台如何管理本体资产；领域本体描述业务概念；实例数据则按领域本体表达具体事实。
 
-元模型的主要职责：
+## 2. Three Modeling Layers
 
-1. 统一管理项目、领域和本体资产。
-2. 统一表达本体类、属性、关系、约束和术语。
-3. 连接企业数据源及其元数据。
-4. 管理 AI 发现任务、候选结果和来源证据。
-5. 管理验证、变更、版本和发布记录。
-6. 为 RDF、OWL、SHACL、SKOS、JSON Schema 等格式和标准提供映射基础。
-
-本设计不将某一种外部本体标准直接作为平台唯一内部数据模型。
-
-## 2. Modeling Boundaries
-
-平台必须区分：
-
-| Layer | Definition | Example |
+| Layer | Purpose | Example |
 |---|---|---|
-| Platform Meta-model | 定义平台如何描述和管理语义资产 | Ontology、OntologyClass、OntologyVersion |
-| Domain Ontology | 描述特定业务领域的概念和语义规则 | Customer、Order、Product |
-| Instance Data | 按领域本体表达的具体业务对象 | C10001、O2026001 |
+| Platform Meta-model | 描述和管理本体资产 | Ontology、OntologyClass、OntologyVersion |
+| Domain Ontology | 描述业务概念和规则 | Customer、Order、Product |
+| Instance Data | 领域本体的具体实例 | C10001、O2026001 |
 
-平台元模型属于平台基础能力；领域本体是平台管理的业务资产；实例数据可作为外部数据源或后续知识图谱能力接入。
+## 3. Core Object Groups
 
-## 3. Core Object Catalog
+### Project and Domain
+- OntologyProject：项目及隔离边界。
+- Domain：项目内业务知识领域。
 
-### 3.1 Project and Domain
+首期 Domain 只归属一个 Project。
 
-| Object | Description | Key Relationships |
+### Ontology Structure
+- Ontology：本体资产身份。
+- OntologyVersion：不可变版本快照。
+- OntologyClass：类。
+- DatatypeProperty：数据类型属性。
+- ObjectProperty：对象属性。
+- Relation：编辑器中的关系建模抽象，映射到 ObjectProperty。
+- Constraint：内部、JSON Schema、SHACL 或 OWL 约束。
+
+Relation 与 ObjectProperty 不应复制同一语义定义。Relation 通过 objectPropertyId 和端点类表达图形化关系。
+
+### Terminology
+- Term：标准术语或概念词条。
+- Alias：带语言、类型和适用范围的别名。
+
+### Data Source and Mapping
+- DataSource：数据库、文档库、API、代码库等来源。
+- MetadataAsset：来源中的表、字段、Schema、文档等资产。
+- DataMapping：来源资产与本体元素的对应关系。
+
+### Discovery and Evidence
+- DiscoveryJob：一次发现任务。
+- DiscoveryProposal：候选类、属性、关系或映射。
+- Evidence：候选项的来源证据。
+
+候选结果未经审核不得直接写入正式版本。
+
+### Validation and Release
+- ValidationRun：针对工作区或具体版本的一次验证。
+- Finding：验证问题、警告或信息项。
+- ChangeRecord：版本变更记录。
+- Release：指向明确不可变版本的发布记录。
+
+## 4. Identifier Strategy
+
+| Identifier | Example | Usage |
 |---|---|---|
-| OntologyProject | 工程项目及隔离边界 | contains Domains and Ontologies |
-| Domain | 项目内的业务知识领域 | belongs to Project; contains Ontologies |
+| Internal ID | UUID | 平台内部稳定身份 |
+| Semantic IRI | `https://example.org/customer#Customer` | RDF/OWL 语义标识 |
+| Source-native ID | `crm.customer.customer_id` | 外部资产标识 |
 
-首期一个 Domain 只归属一个 Project。
+内部 ID 不随重命名而变化。IRI 变化必须记录迁移关系。源系统 ID 必须在 DataSource 范围内解释，不能直接替代内部 ID。
 
-### 3.2 Ontology Structure
+## 5. Common Fields
 
-| Object | Description | Key Relationships |
-|---|---|---|
-| Ontology | 持续演进的本体资产身份 | belongs to Domain |
-| OntologyVersion | 不可变的本体版本快照 | belongs to Ontology |
-| OntologyClass | 本体类 | belongs to OntologyVersion |
-| DatatypeProperty | 数据类型属性 | references domain classes and datatype IRIs |
-| ObjectProperty | 对象属性 | references domain and range classes |
-| Relation | 本体关系的建模与呈现抽象 | maps to an ObjectProperty |
-| Constraint | 本体或数据验证约束 | targets ontology elements or graphs |
+项目范围对象按需包含：
+- `id`
+- `projectId`
+- `createdAt`
+- `updatedAt`
+- `createdBy`
+- `updatedBy`
+- `extensions`
 
-Relation 与 ObjectProperty 不应重复持有同一语义定义。ObjectProperty 是标准语义对象；Relation 是平台建模层的关系表达，使用 objectPropertyId 或 predicateIri 建立映射。
+本体版本范围对象还应包含 `ontologyId`、`ontologyVersionId`、`iri` 和来源引用。
 
-### 3.3 Terminology
+不是所有对象都必须拥有全部字段；每种对象以自己的 Schema 为准。
 
-| Object | Description |
+## 6. Snapshot and Versioning
+
+Ontology 是持续演进的资产身份；OntologyVersion 是某个时间点的不可变快照。
+
+草稿区可修改。正式版本不能原地修改。每个发布记录必须引用一个明确版本、验证记录和制品摘要。
+
+快照建议包含 Schema 版本、Ontology ID、Project ID、语义对象集合、来源引用和创建信息。大文件放入 S3 兼容对象存储，数据库保存引用和 SHA-256 摘要。
+
+## 7. Relation and ObjectProperty
+
+ObjectProperty 承载 OWL 对象属性语义，包括 domain、range、inverse 和 property characteristics。Relation 是平台编辑与可视化层的关系实例，引用一个 ObjectProperty，并给出源类与目标类。
+
+验证器必须检查 Relation 的源类和目标类与 ObjectProperty 的 domain/range 一致。
+
+## 8. JSON Schema
+
+采用 JSON Schema Draft 2020-12。公共字段放入 `common.schema.json`，对象 Schema 通过 `$ref` 引用公共定义。Schema 验证结构、类型、必填字段和枚举；引用完整性、项目隔离和本体语义由后端验证器处理。
+
+格式校验必须显式启用。不要假设任意 JSON Schema 验证器都会将 `format` 默认作为断言。
+
+## 9. Validation Responsibility
+
+| Layer | Responsibility |
 |---|---|
-| Term | 标准化术语或概念词条 |
-| Alias | 术语的替代标签、缩写或别名 |
+| JSON Schema / Pydantic | 对象结构和字段规则 |
+| Reference Validator | 对象存在、类型、项目和版本归属 |
+| Semantic Validator | IRI 唯一性、类层次、属性端点和关系一致性 |
+| SHACL | RDF 图约束 |
+| OWL tooling | 本体逻辑一致性与适用推理任务 |
 
-Term 应支持多语言首选标签；Alias 必须关联 Term，并保留语言、类型和适用范围。
+SHACL 通过不等于 OWL 逻辑一致性已证明；OWL 未发现矛盾也不意味着业务完整性规则全部满足。
 
-### 3.4 Data Source and Mapping
+## 10. Project Isolation
 
-| Object | Description |
-|---|---|
-| DataSource | 外部数据库、文档库、API、代码库等数据源 |
-| MetadataAsset | 从数据源采集的表、字段、Schema、文档等资产 |
-| DataMapping | 元数据资产与本体对象之间的映射 |
+默认内部引用必须属于同一 Project。跨项目复用只能通过受控共享资产机制，并引用已发布的不可变版本。未经授权的草稿引用必须被拒绝。
 
-连接凭据使用 Secret Reference。禁止在元模型记录、任务日志和导出文件中保存明文凭据。
+## 11. Extension Policy
 
-### 3.5 Discovery and Evidence
+扩展字段统一放入 `extensions`，使用反向域名或组织命名空间隔离。扩展必须有 Schema 和维护责任，不得覆盖核心字段或绕过权限检查。
 
-| Object | Description |
-|---|---|
-| DiscoveryJob | 一次 AI 或规则驱动的本体发现任务 |
-| DiscoveryProposal | 发现任务产生的候选类、属性、关系或映射 |
-| Evidence | 候选结果的来源证据 |
+## 12. Compatibility Policy
 
-DiscoveryProposal 是非正式候选资产。未经审核，不得直接修改正式 OntologyVersion。
+- 增加可选字段：通常兼容。
+- 增加枚举值：需检查旧客户端。
+- 修改字段类型、必填要求或语义：不兼容变更。
+- 删除字段：不兼容变更。
 
-### 3.6 Validation, Change and Release
+不兼容变更使用新的主版本，并提供显式迁移函数。未知版本和降级迁移默认拒绝。
 
-| Object | Description |
-|---|---|
-| ValidationRun | 针对明确对象或版本的一次验证任务 |
-| Finding | 验证发现的问题、警告或信息项 |
-| ChangeRecord | 本体对象的新增、修改、删除和迁移记录 |
-| Release | 对明确版本进行的发布记录 |
+## 13. Persistence
 
-Release 必须引用一个确定的 OntologyVersion，并保留验证结果和制品引用。
+MVP 使用 PostgreSQL 保存结构化对象、引用和审核记录；JSONB 保存受控扩展；S3 兼容对象存储保存源文件、版本快照和导出制品。首期不强制引入图数据库或专用 RDF 三元组库。
 
-## 4. Core Object Relationships
+## 14. Acceptance Criteria
 
-```mermaid
-flowchart TD
-    P["OntologyProject"] --> D["Domain"]
-    D --> O["Ontology"]
-    O --> V["OntologyVersion"]
+- [ ] 所有对象 Schema 均符合 Draft 2020-12。
+- [ ] 合法对象通过，非法对象被拒绝。
+- [ ] 内部 ID 在重命名后保持稳定。
+- [ ] IRI 变更有变更记录。
+- [ ] 所有内部引用可以解析且目标类型正确。
+- [ ] 未授权跨项目引用被拒绝。
+- [ ] 正式版本不可变，快照摘要可复算。
+- [ ] Release 引用准确版本和通过的验证任务。
+- [ ] 导入导出不支持的结构有警告或错误。
+- [ ] Schema 变更有兼容性分类和迁移路径。
 
-    V --> C["OntologyClass"]
-    V --> DP["DatatypeProperty"]
-    V --> OP["ObjectProperty"]
-    OP --> R["Relation"]
-    V --> CT["Constraint"]
-    V --> T["Term"]
+## 15. Implementation Status
 
-    P --> DS["DataSource"]
-    DS --> MA["MetadataAsset"]
-    MA --> DM["DataMapping"]
-    DM --> C
-
-    O --> DJ["DiscoveryJob"]
-    DJ --> PR["DiscoveryProposal"]
-    PR --> E["Evidence"]
-
-    V --> VR["ValidationRun"]
-    VR --> F["Finding"]
-    V --> CR["ChangeRecord"]
-    V --> RL["Release"]
-```
-
-### 4.1 Relationship Rules
-
-- Project contains one or more Domains.
-- Domain belongs to exactly one Project.
-- Ontology belongs to one Domain and one Project.
-- Ontology has one or more versions over its lifecycle.
-- OntologyVersion references one Ontology.
-- Classes, properties, relations, terms and constraints belong to a version snapshot.
-- DataSource and MetadataAsset carry project scope.
-- DataMapping references a source MetadataAsset and a target semantic element.
-- DiscoveryJob belongs to a project and may target an Ontology.
-- DiscoveryProposal belongs to one DiscoveryJob.
-- Evidence belongs to a proposal or an explicitly defined source record.
-- ValidationRun references a draft workspace or an immutable OntologyVersion.
-- Finding belongs to a ValidationRun.
-- Release references one immutable OntologyVersion.
-
-## 5. Identifier Strategy
-
-P1 must distinguish three identifier categories:
-
-| Identifier | Example | Purpose |
-|---|---|---|
-| Internal ID | UUID | Stable platform identity |
-| Semantic IRI | `https://example.org/customer#Customer` | RDF/OWL semantic identity |
-| Source ID | `crm.customer.customer_id` | External system identity |
-
-Rules:
-
-1. Internal IDs are immutable after creation.
-2. Renaming an object must not regenerate its internal ID.
-3. Changing a semantic IRI requires an explicit migration record.
-4. Source IDs must be scoped by their DataSource.
-5. IDs must not be reused after deletion.
-6. Versioned semantic elements must preserve stable identity across versions when they represent the same continuing element.
-7. If an element is replaced by a semantically different element, create a new identity and record the replacement relationship.
-
-UUID is the MVP internal identifier baseline. IRI validation must use an IRI-aware validator; do not assume every valid IRI is necessarily accepted by a generic URL validator.
-
-## 6. Common Fields
-
-Project-scoped objects should include:
-
-| Field | Type | Requirement |
-|---|---|---|
-| id | UUID | Required, immutable |
-| projectId | UUID | Required |
-| createdAt | DateTime | Required |
-| updatedAt | DateTime | Required |
-| createdBy | User ID | Required |
-| updatedBy | User ID | Required |
-| status | Enum | Required where lifecycle applies |
-| extensions | JSON Object | Optional, namespaced |
-
-Ontology-version-scoped semantic elements additionally include:
-
-- ontologyId
-- ontologyVersionId
-- iri
-- sourceRefs
-- annotations
-
-Do not force every common field onto every object. Each object schema defines its own required fields.
-
-## 7. Versioning and Snapshot Rules
-
-Ontology is the long-lived asset identity.
-
-OntologyVersion is an immutable snapshot.
-
-Draft editing must use a controlled workspace or draft revision. A published version cannot be modified in place.
-
-A version snapshot should include:
-
-- Schema version
-- Ontology ID
-- Project ID
-- Version number
-- Namespace declarations
-- Classes
-- Datatype properties
-- Object properties
-- Relations
-- Constraints
-- Terms and aliases
-- Source and provenance references
-- Snapshot creation metadata
-- Content hash
-
-Large source files and exported artifacts may be stored in object storage. The database stores their stable references and content hashes.
-
-## 8. Cross-project Reference Rules
-
-By default, internal object references must resolve within the same project.
-
-The following must be rejected:
-
-- Project A class references Project B property by internal ID.
-- Project A mapping targets an unpublished Project B draft.
-- A Release references a version owned by a different project without an authorized shared-asset relationship.
-
-Cross-project reuse may be introduced through a dedicated shared-asset mechanism. It must reference a published immutable version and include explicit access authorization.
-
-External IRIs are not internal object references and must be handled under a separate external-reference policy.
-
-## 9. Object Lifecycle
-
-### DiscoveryProposal
-
-`pending → approved | rejected`
-
-Approved proposals are converted into formal change commands. They are not directly written into a released version.
-
-### ValidationRun
-
-`queued → running → passed | failed | cancelled`
-
-A validation run must record the target version or workspace revision, validator versions and ruleset versions.
-
-### Release
-
-`preparing → published → withdrawn`
-
-A published release points to an immutable version. Withdrawal changes publication status; it does not mutate historical version content.
-
-## 10. JSON Schema Policy
-
-- Schema dialect: JSON Schema Draft 2020-12.
-- Each schema has a stable `$id`.
-- Reusable definitions are placed in `$defs` or shared schema documents.
-- Core objects use `additionalProperties: false` unless an explicit extension point exists.
-- Extensions are isolated under a namespaced `extensions` object.
-- UUID, datetime, IRI and language tags require explicit format or custom validation.
-- Format assertion must be enabled explicitly in the selected validator.
-- Schema compatibility is tested before release.
-
-JSON Schema validates the shape of an object. It does not replace database referential integrity, cross-project authorization, or ontology semantic validation.
-
-## 11. Validation Responsibilities
-
-| Validator | Responsibility |
-|---|---|
-| JSON Schema | Object structure, required fields and types |
-| Pydantic | API and application model validation |
-| Reference Validator | Object existence, project ownership and type correctness |
-| Meta-model Validator | Internal model constraints and lifecycle rules |
-| SHACL | RDF graph constraints |
-| OWL tooling | Logical consistency and supported reasoning tasks |
-
-SHACL and OWL checks serve different purposes. A successful SHACL run does not prove full OWL logical consistency, and the absence of OWL inconsistency does not prove that application data meets all business completeness requirements.
-
-## 12. Extension Policy
-
-Extensions must be namespaced and versioned.
-
-Example:
-
-```json
-{
-  "extensions": {
-    "com.example.telecom": {
-      "networkElementType": "router"
-    }
-  }
-}
-```
-
-Extension fields must not override core fields or bypass access control.
-
-Standards support should be added through adapters rather than by modifying core object semantics for every external format.
-
-## 13. Backward Compatibility
-
-| Change | Default Classification |
-|---|---|
-| Add optional field | Usually backward compatible |
-| Add enum value | Potentially breaking for strict consumers |
-| Change default behavior | Requires compatibility review |
-| Change field type | Breaking |
-| Remove field | Breaking |
-| Change semantic meaning | Breaking |
-
-Breaking changes require a new major schema version and an explicit migration.
-
-## 14. Persistence Strategy
-
-MVP persistence:
-
-- PostgreSQL relational tables for core objects and references.
-- JSONB for controlled extension payloads and variable provider metadata.
-- S3-compatible object storage for large source files, immutable snapshots and exported artifacts.
-- Content hashes for snapshot and artifact integrity.
-
-A dedicated graph database is not a required dependency for the initial meta-model implementation.
-
-## 15. Acceptance Criteria
-
-### Schema Tests
-- [ ] All core object schemas are valid Draft 2020-12 schemas.
-- [ ] Valid objects pass.
-- [ ] Invalid objects fail with useful paths and messages.
-- [ ] Unknown core fields are rejected.
-- [ ] Namespaced extensions are preserved.
-
-### Identifier Tests
-- [ ] Internal IDs remain unchanged after renaming.
-- [ ] IRI migration creates a ChangeRecord.
-- [ ] External source IDs are scoped to their DataSource.
-
-### Reference Tests
-- [ ] All internal references resolve.
-- [ ] Reference target types are correct.
-- [ ] Project IDs match.
-- [ ] Unauthorized cross-project references are rejected.
-- [ ] OntologyVersion references a valid Ontology.
-
-### Version Tests
-- [ ] Published versions are immutable.
-- [ ] Release references a specific version.
-- [ ] Snapshot hash remains stable.
-- [ ] A new version can be compared with its predecessor.
-
-### Interoperability Tests
-- [ ] Import/export fixtures are available.
-- [ ] Unsupported constructs generate warnings or errors.
-- [ ] Round-trip tests compare semantic structures.
-- [ ] Conversion losses are reported.
-
-## 16. Implementation Status
-
-This document is a design baseline. It does not imply that all objects, schemas, tables, validators or adapters have been implemented or accepted.
+本文档和配套代码是 P1 元模型工程基线，不表示生产数据库、API、标准适配器或完整生命周期功能已经部署或验收。

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.p1.invalid/discovery-proposal.schema.json",
+  "title": "DiscoveryProposal",
+  "allOf": [
+    {
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/projectScoped"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "discoveryJobId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "candidateType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload": {
+          "type": "object"
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "approved",
+            "rejected",
+            "merged"
+          ]
+        },
+        "evidenceIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+          }
+        },
+        "reviewedBy": {
+          "oneOf": [
+            {
+              "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reviewedAt": {
+          "oneOf": [
+            {
+              "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/dateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reviewComment": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "discoveryJobId",
+        "candidateType",
+        "payload",
+        "status",
+        "evidenceIds"
+      ]
+    }
+  ],
+  "unevaluatedProperties": false
+}

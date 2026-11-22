@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.p1.invalid/data-mapping.schema.json",
+  "title": "DataMapping",
+  "allOf": [
+    {
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/projectScoped"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "sourceAssetId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "targetElementId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "targetElementType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mappingType": {
+          "enum": [
+            "exact",
+            "transform",
+            "semantic",
+            "candidate"
+          ]
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "approved",
+            "rejected",
+            "active",
+            "deprecated"
+          ]
+        },
+        "evidenceIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+          }
+        },
+        "expressionRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "sourceAssetId",
+        "targetElementId",
+        "targetElementType",
+        "mappingType",
+        "status",
+        "evidenceIds"
+      ]
+    }
+  ],
+  "unevaluatedProperties": false
+}

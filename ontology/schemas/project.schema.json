@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.p1.invalid/project.schema.json",
+  "title": "OntologyProject",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "slug",
+    "status",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "id": {
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "maxLength": 100
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "active",
+        "archived",
+        "deprecated"
+      ]
+    },
+    "createdAt": {
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/dateTime"
+    },
+    "updatedAt": {
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/dateTime"
+    }
+  }
+}

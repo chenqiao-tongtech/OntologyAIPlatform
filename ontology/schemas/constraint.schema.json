@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.p1.invalid/constraint.schema.json",
+  "title": "Constraint",
+  "allOf": [
+    {
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/projectScoped"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "ontologyId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "ontologyVersionId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "targetType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "engine": {
+          "enum": [
+            "internal",
+            "json_schema",
+            "shacl",
+            "owl"
+          ]
+        },
+        "severity": {
+          "enum": [
+            "info",
+            "warning",
+            "error",
+            "critical"
+          ]
+        },
+        "expression": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "expressionRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "ontologyId",
+        "ontologyVersionId",
+        "targetType",
+        "targetId",
+        "engine",
+        "severity"
+      ]
+    },
+    {
+      "oneOf": [
+        {
+          "required": [
+            "expression"
+          ],
+          "properties": {
+            "expression": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "not": {
+            "required": [
+              "expressionRef"
+            ]
+          }
+        },
+        {
+          "required": [
+            "expressionRef"
+          ],
+          "properties": {
+            "expressionRef": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "not": {
+            "required": [
+              "expression"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "unevaluatedProperties": false
+}

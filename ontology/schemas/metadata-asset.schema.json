@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.p1.invalid/metadata-asset.schema.json",
+  "title": "MetadataAsset",
+  "allOf": [
+    {
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/projectScoped"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "dataSourceId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "assetType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "qualifiedName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceNativeId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "metadataSnapshotRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "attributes": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "dataSourceId",
+        "assetType",
+        "qualifiedName",
+        "attributes"
+      ]
+    }
+  ],
+  "unevaluatedProperties": false
+}

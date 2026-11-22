@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.p1.invalid/ontology.schema.json",
+  "title": "Ontology",
+  "allOf": [
+    {
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/projectScoped"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "domainId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "namespace": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/iri"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "active",
+            "archived",
+            "deprecated"
+          ]
+        },
+        "currentVersionId": {
+          "oneOf": [
+            {
+              "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "domainId",
+        "name",
+        "namespace",
+        "status"
+      ]
+    }
+  ],
+  "unevaluatedProperties": false
+}

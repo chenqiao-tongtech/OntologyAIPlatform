@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.p1.invalid/property.schema.json",
+  "title": "DatatypeProperty or ObjectProperty",
+  "oneOf": [
+    {
+      "$ref": "https://schemas.p1.invalid/property.schema.json#/$defs/datatypeProperty"
+    },
+    {
+      "$ref": "https://schemas.p1.invalid/property.schema.json#/$defs/objectProperty"
+    }
+  ],
+  "$defs": {
+    "datatypeProperty": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.p1.invalid/datatype-property.schema.json",
+      "title": "DatatypeProperty",
+      "allOf": [
+        {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/projectScoped"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ontologyId": {
+              "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+            },
+            "ontologyVersionId": {
+              "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+            },
+            "iri": {
+              "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/iri"
+            },
+            "domainClassIds": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+              }
+            },
+            "datatypeIri": {
+              "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/iri"
+            },
+            "minCount": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "maxCount": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            }
+          },
+          "required": [
+            "ontologyId",
+            "ontologyVersionId",
+            "iri",
+            "domainClassIds",
+            "datatypeIri"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "objectProperty": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://schemas.p1.invalid/object-property.schema.json",
+      "title": "ObjectProperty",
+      "allOf": [
+        {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/projectScoped"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ontologyId": {
+              "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+            },
+            "ontologyVersionId": {
+              "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+            },
+            "iri": {
+              "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/iri"
+            },
+            "domainClassIds": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+              }
+            },
+            "rangeClassIds": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+              }
+            },
+            "inversePropertyId": {
+              "oneOf": [
+                {
+                  "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "characteristics": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "enum": [
+                  "functional",
+                  "inverseFunctional",
+                  "transitive",
+                  "symmetric",
+                  "asymmetric",
+                  "reflexive",
+                  "irreflexive"
+                ]
+              }
+            }
+          },
+          "required": [
+            "ontologyId",
+            "ontologyVersionId",
+            "iri",
+            "domainClassIds",
+            "rangeClassIds",
+            "characteristics"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}

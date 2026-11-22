@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.p1.invalid/validation-run.schema.json",
+  "title": "ValidationRun",
+  "allOf": [
+    {
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/projectScoped"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "targetType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "validatorName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "validatorVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rulesetVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "queued",
+            "running",
+            "passed",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "summary": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "reportRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "targetType",
+        "targetId",
+        "validatorName",
+        "validatorVersion",
+        "rulesetVersion",
+        "status",
+        "summary"
+      ]
+    }
+  ],
+  "unevaluatedProperties": false
+}

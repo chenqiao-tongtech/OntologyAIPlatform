@@ -1,8 +1,7 @@
-
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.example.invalid/p1/ontology-version.schema.json",
-  "title": "P1 Ontology Version",
+  "$id": "https://schemas.p1.invalid/ontology-version.schema.json",
+  "title": "OntologyVersionSnapshot",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -16,282 +15,69 @@
     "datatypeProperties",
     "objectProperties",
     "relations",
+    "constraints",
+    "terms",
     "createdAt"
   ],
   "properties": {
     "id": {
-      "type": "string",
-      "format": "uuid"
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
     },
     "projectId": {
-      "type": "string",
-      "format": "uuid"
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
     },
     "ontologyId": {
-      "type": "string",
-      "format": "uuid"
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
     },
     "version": {
       "type": "string",
-      "minLength": 1
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
     },
     "schemaVersion": {
       "type": "string",
-      "minLength": 1
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
     },
     "namespace": {
-      "type": "string",
-      "minLength": 1
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/iri"
     },
     "classes": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/ontologyClass"
+        "$ref": "https://schemas.p1.invalid/class.schema.json"
       }
     },
     "datatypeProperties": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/datatypeProperty"
+        "$ref": "https://schemas.p1.invalid/property.schema.json#/$defs/datatypeProperty"
       }
     },
     "objectProperties": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/objectProperty"
+        "$ref": "https://schemas.p1.invalid/property.schema.json#/$defs/objectProperty"
       }
     },
     "relations": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/relation"
+        "$ref": "https://schemas.p1.invalid/relation.schema.json"
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.p1.invalid/constraint.schema.json"
+      }
+    },
+    "terms": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.p1.invalid/term.schema.json"
       }
     },
     "createdAt": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "extensions": {
-      "type": "object",
-      "additionalProperties": true
-    }
-  },
-  "$defs": {
-    "label": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "value",
-        "language"
-      ],
-      "properties": {
-        "value": {
-          "type": "string",
-          "minLength": 1
-        },
-        "language": {
-          "type": "string",
-          "minLength": 2
-        }
-      }
-    },
-    "ontologyClass": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "projectId",
-        "iri",
-        "preferredLabels",
-        "parentClassIds"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "projectId": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "iri": {
-          "type": "string",
-          "minLength": 1
-        },
-        "preferredLabels": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/$defs/label"
-          }
-        },
-        "definition": {
-          "type": "string"
-        },
-        "parentClassIds": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "abstract": {
-          "type": "boolean",
-          "default": false
-        },
-        "extensions": {
-          "type": "object",
-          "additionalProperties": true
-        }
-      }
-    },
-    "datatypeProperty": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "projectId",
-        "iri",
-        "domainClassIds",
-        "datatypeIri"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "projectId": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "iri": {
-          "type": "string",
-          "minLength": 1
-        },
-        "domainClassIds": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "datatypeIri": {
-          "type": "string",
-          "minLength": 1
-        },
-        "minCount": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "maxCount": {
-          "type": "integer",
-          "minimum": 0
-        }
-      }
-    },
-    "objectProperty": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "projectId",
-        "iri",
-        "domainClassIds",
-        "rangeClassIds"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "projectId": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "iri": {
-          "type": "string",
-          "minLength": 1
-        },
-        "domainClassIds": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "rangeClassIds": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "inversePropertyId": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "format": "uuid"
-        },
-        "characteristics": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "enum": [
-              "functional",
-              "inverseFunctional",
-              "transitive",
-              "symmetric",
-              "asymmetric",
-              "reflexive",
-              "irreflexive"
-            ]
-          }
-        }
-      }
-    },
-    "relation": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "projectId",
-        "objectPropertyId",
-        "sourceClassId",
-        "targetClassId"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "projectId": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "objectPropertyId": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "sourceClassId": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "targetClassId": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "displayLabel": {
-          "type": "string"
-        }
-      }
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/dateTime"
     }
   }
 }

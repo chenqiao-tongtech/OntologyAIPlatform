@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.p1.invalid/release.schema.json",
+  "title": "Release",
+  "allOf": [
+    {
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/projectScoped"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "ontologyId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "ontologyVersionId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "validationRunId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "status": {
+          "enum": [
+            "preparing",
+            "published",
+            "withdrawn"
+          ]
+        },
+        "artifactRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "publishedAt": {
+          "oneOf": [
+            {
+              "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/dateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "ontologyId",
+        "ontologyVersionId",
+        "validationRunId",
+        "status",
+        "artifactRef",
+        "artifactSha256"
+      ]
+    }
+  ],
+  "unevaluatedProperties": false
+}

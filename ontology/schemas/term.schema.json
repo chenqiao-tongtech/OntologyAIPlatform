@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.p1.invalid/term.schema.json",
+  "title": "Term",
+  "allOf": [
+    {
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/projectScoped"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "ontologyId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "ontologyVersionId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "iri": {
+          "oneOf": [
+            {
+              "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/iri"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "preferredLabels": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/label"
+          }
+        },
+        "definition": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "ontologyId",
+        "ontologyVersionId",
+        "preferredLabels"
+      ]
+    }
+  ],
+  "unevaluatedProperties": false
+}

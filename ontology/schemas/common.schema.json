@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.p1.invalid/common.schema.json",
+  "title": "P1 Shared Schema Definitions",
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "iri": {
+      "type": "string",
+      "format": "iri",
+      "minLength": 1
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "label": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "language"
+      ],
+      "properties": {
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "language": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 35
+        }
+      }
+    },
+    "sourceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceType",
+        "sourceId"
+      ],
+      "properties": {
+        "sourceType": {
+          "enum": [
+            "database_metadata",
+            "api_schema",
+            "document",
+            "code",
+            "user_input",
+            "external_iri",
+            "model_output"
+          ]
+        },
+        "sourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "locator": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contentRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "projectScoped": {
+      "type": "object",
+      "required": [
+        "id",
+        "projectId",
+        "createdAt",
+        "updatedAt",
+        "createdBy",
+        "updatedBy"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "projectId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "createdAt": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/dateTime"
+        },
+        "updatedAt": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/dateTime"
+        },
+        "createdBy": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "updatedBy": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "extensions": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/extensions"
+        }
+      }
+    }
+  }
+}

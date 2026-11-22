@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.p1.invalid/evidence.schema.json",
+  "title": "Evidence",
+  "allOf": [
+    {
+      "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/projectScoped"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "proposalId": {
+          "$ref": "https://schemas.p1.invalid/common.schema.json#/$defs/uuid"
+        },
+        "sourceType": {
+          "enum": [
+            "database_metadata",
+            "api_schema",
+            "document",
+            "code",
+            "user_input",
+            "external_iri",
+            "model_output"
+          ]
+        },
+        "sourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "location": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contentRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contentSha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "excerpt": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "proposalId",
+        "sourceType",
+        "sourceId"
+      ]
+    }
+  ],
+  "unevaluatedProperties": false
+}
